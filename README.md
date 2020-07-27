@@ -5,7 +5,13 @@ http://www-math.mit.edu/~dav/projectsB.pdf.
 
 # Setup
 
-Make sure your computer is running Python 3. Then clone the repo, cd into the folder, and run
+Make sure your computer is running Python 3.
+
+Dependencies
+    numpy
+    matplotlib
+
+Clone the repo, cd into the folder, and run
 `python planegrid.py`. Then use the right arrow key to simulate steps of the flea.
 
 # Contributors
