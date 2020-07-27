@@ -11,8 +11,13 @@ Dependencies
     numpy
     matplotlib
 
-Clone the repo, cd into the folder, and run
-`python planegrid.py`. Then use the right arrow key to simulate steps of the flea.
+Clone the repo: `git clone https://github.com/wang-daniel/GraphingFleas.git`,
+
+cd into the folder: `cd GraphingFleas`
+
+run the file: `python planegrid.py`.
+
+Then use the right arrow key to simulate steps of the flea.
 
 # Contributors
 
