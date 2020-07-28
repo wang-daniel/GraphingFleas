@@ -158,7 +158,7 @@ class Grid:
 if __name__ == "__main__":
 	flea = Flea(Coordinate(0, 0), Direction.UP)
 	rule = {
-		State.RED: (State.BLUE, Direction.DOWN), 
+		State.RED: (State.BLUE, Direction.DOWN),
 		State.BLUE: (State.BLUE, Direction.LEFT)}
 	grid = Grid(flea, rule, State.RED)
 	grid.visualize()

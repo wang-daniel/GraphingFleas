@@ -1,0 +1,70 @@
+0. State 0 -> (State 0, *)
+    Same situation as 1 state, 4 directions. Flea travels in
+        Up ... +++++
+        [or]
+        Up left down right ... [or symm.]
+        [or]
+        Up down...
+
+1. State 0 -> (State 1, *)
+    1.0 State 0 -> (State 1, UP)
+        Travel in straight line, leaving a trail of State 1 points +++++
+
+    1.1 State 0 -> (State 1, LEFT) or State 0 -> (State 1, RIGHT)
+        1.1.0 State 1 -> (State 1, *)
+            1.1.0.0 State 1 -> (State 1, UP)
+                "Growing Ladder" +++++
+
+            1.1.0.1 State 1 -> (State 1, LEFT) or State 1 -> (State 1, RIGHT)
+                Up left down right ... [or symm.]
+
+            1.1.0.2 State 1 -> (State 1, DOWN)
+                Up left down right + (Up down ...) [or symm. ]
+
+            1.1.0.3 State 1 -> (State 1, RIGHT) or State 1 -> (State 1, LEFT)
+                "Draw 5 squares" + (Up right down left...) [or symm.]
+
+        1.1.1 State 1 -> (State 0, *)
+            1.1.1.0 State 1 -> (State 0, UP)
+                "Complex Growing Ladder" +++++
+
+            1.1.1.1 State 1 -> (State 0, LEFT) or State 1 -> (State 0, Right)
+                Up left down right ... [or symm.]
+                State of points toggle with period 4
+
+            1.1.1.2 State 1 -> (State 0, DOWN)
+                Up left down right up down up left right left down up down right
+                ...
+                [or symm.]
+
+            1.1.1.3 State 1 -> (State 0, RIGHT) or State 1 -> (State 0, LEFT)
+                "Complex Growing Square" +++++
+
+    1.2 State 0 -> (State 1, DOWN)
+        1.2.0 State 1 -> (State 1, *)
+            1.2.0.0 State 1 -> (State 1, UP)
+                "Suicide Running Drill" +++++
+
+            1.2.0.1 State 1 -> (State 1, LEFT) or State 1 -> (State 1, RIGHT)
+                "Short circle with horn"
+
+            1.2.0.2 State 1 -> (State 1, DOWN)
+                Up down...
+                State of visited points remain in state 1
+
+        1.2.1 State 1 -> (State 0, *)
+            1.2.1.0 State 1 -> (State 0, UP)
+                Up down up ...
+
+            1.2.1.1 State 1 -> (State 0, LEFT) or State 1 -> (State 0, RIGHT)
+                Up down up left right left down up down right up left
+                down up down right left right up down up left down right
+                ...
+                [or symm.]
+
+            1.2.1.2 State 1 -> (State 0, DOWN)
+                Up down ...
+                State of each point on grid toggles with period 2
+
+
+
