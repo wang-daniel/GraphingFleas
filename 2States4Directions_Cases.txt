@@ -1,6 +1,12 @@
+Note:   Initial direction is assumed to be "UP"
+        +++++ denotes an infinitely expanding pattern
+        xyz ... denotes xyz repeated infinitely
+        [] denotes a logical operation
+        symm. denotes left-right symmetry
+
 0. State 0 -> (State 0, *)
     Same situation as 1 state, 4 directions. Flea travels in
-        Up ... +++++
+        "Straight Line" +++++
         [or]
         Up left down right ... [or symm.]
         [or]
@@ -8,7 +14,7 @@
 
 1. State 0 -> (State 1, *)
     1.0 State 0 -> (State 1, UP)
-        Travel in straight line, leaving a trail of State 1 points +++++
+        "Straight Line", leaving a trail of State 1 points +++++
 
     1.1 State 0 -> (State 1, LEFT) or State 0 -> (State 1, RIGHT)
         1.1.0 State 1 -> (State 1, *)
