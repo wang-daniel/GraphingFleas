@@ -86,17 +86,13 @@ class Grid:
 	(see http://www-math.mit.edu/~dav/projectsB.pdf) for more information.
 
 	In addition, the visited dictionary is used to keep track of the states of coordinates
-	that have already been visited by the flea, and the xs, ys, and colors arrays are used
-	for visualization purposes.
+	that have already been visited by the flea.
 	"""
 	def __init__(self, flea, rule, initialState):
 		self.flea = flea
 		self.rule = rule
 		self.initialState = initialState
 		self.visited = {} 
-		self.xs = np.array([flea.position.x])
-		self.ys = np.array([flea.position.y])
-		self.colors = np.array([initialState.value])
 
 	def step(self):
 		"""
@@ -113,11 +109,7 @@ class Grid:
 		self.visited[Coordinate(self.flea.position.x, self.flea.position.y)] = newState
 		self.flea.turn(turnDirection)
 
-		self.xs = np.append(self.xs, self.flea.position.x)
-		self.ys = np.append(self.ys, self.flea.position.y)
-		self.colors = np.append(self.colors, newState.value)
-
-	def visualize(self, size=5):
+	def visualize(self, size=5, lines=True):
 		"""
 		blah blah plotting code that I copied pasted off stack overflow
 		"""
@@ -136,29 +128,34 @@ class Grid:
 		ax.yaxis.set_major_formatter(NullFormatter())
 		ax.tick_params(axis='both', length=0)
 		plt.grid(True, ls=':')
-		plt.gcf().canvas.mpl_connect('key_press_event', self.on_keyboard)
-		self.draw()
+		plt.gcf().canvas.mpl_connect('key_press_event', lambda x: self.on_keyboard(x, lines))
+		self.draw(lines)
 		plt.show()
 
-	def on_keyboard(self, event):
+	def on_keyboard(self, event, lines):
 		"""
 		steps the grid when the right arrow key is pressed
 		"""
 		if event.key == 'right':
-			self.lastVisited.remove()
+			self.fleaPoint.remove()
 			self.step()
-			self.draw()
+			self.draw(lines)
 			plt.draw()
 
-	def draw(self):
-		plt.plot(self.xs, self.ys, 'k-', zorder=0)
-		plt.scatter(self.xs, self.ys, c=self.colors, s=25, zorder=3) 
-		self.lastVisited = plt.scatter(self.xs[-1], self.ys[-1], c=self.colors[-1], s=25, zorder=3, edgecolors="k", linewidths=2)
+	def draw(self, lines):
+		x = self.flea.position.x
+		y = self.flea.position.y
+		if hasattr(self, 'fleaLoc') and lines: 
+			plt.plot([self.fleaLoc.x, x], [self.fleaLoc.y, y], 'k-', zorder=0)
+		self.fleaLoc = Coordinate(x, y)
+		color = self.visited[self.flea.position].value if flea.position in self.visited else self.initialState.value
+		plt.scatter(x, y, c=color, s=25, zorder=3)
+		self.fleaPoint = plt.scatter(x, y, c=color, s=25, zorder=3, edgecolors="k", linewidths=2)
 
 if __name__ == "__main__":
 	flea = Flea(Coordinate(0, 0), Direction.UP)
 	rule = {
-		State.RED: (State.BLUE, Direction.DOWN),
-		State.BLUE: (State.BLUE, Direction.LEFT)}
+		State.RED: (State.BLUE, Direction.LEFT),
+		State.BLUE: (State.RED, Direction.RIGHT)}
 	grid = Grid(flea, rule, State.RED)
 	grid.visualize()
