@@ -152,10 +152,21 @@ class Grid:
 		plt.scatter(x, y, c=color, s=25, zorder=3)
 		self.fleaPoint = plt.scatter(x, y, c=color, s=25, zorder=3, edgecolors="k", linewidths=2)
 
+	def radius(self):
+		"""
+		Computes the "radius" of the path.
+		"""
+		return sorted(map(lambda position: abs(position.x) + abs(position.y), self.visited.keys()), reverse=True)[0]
+
 if __name__ == "__main__":
 	flea = Flea(Coordinate(0, 0), Direction.UP)
 	rule = {
 		State.RED: (State.BLUE, Direction.LEFT),
 		State.BLUE: (State.RED, Direction.RIGHT)}
 	grid = Grid(flea, rule, State.RED)
-	grid.visualize()
+	radii = []
+	for step in range(10000):
+		grid.step()
+		radii.append(grid.radius())
+	plt.plot(radii)
+	plt.show()
