@@ -214,6 +214,6 @@ if __name__ == "__main__":
 		radii.append(grid.radius())
 	plt.plot(radii)
 	plt.show()
-	grid.visualize2(size = 500, lines = False)
+	grid.visualize2(size = 1500, lines = False)
 
 
