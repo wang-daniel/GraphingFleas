@@ -92,11 +92,27 @@ class Grid:
 	In addition, the visited dictionary is used to keep track of the states of coordinates
 	that have already been visited by the flea.
 	"""
-	def __init__(self, flea, rule, initialState):
+	def __init__(self, flea, rule, defaultState, initialStates = np.empty([0]), initialStatesInterpreter = None):
 		self.flea = flea
 		self.rule = rule
-		self.initialState = initialState
-		self.visited = {} 
+		self.defaultState = defaultState
+		self.initiated = {}
+		# self.initiated is a hashmap whose keys are the positions whose states
+		# have been changed at least once; and the values are the current states
+		# of those positions.
+
+		# Using the inputted initial states array to initiate some positions
+		if initialStates.shape != (0,):
+			r = initialStates.shape[0]
+			c = initialStates.shape[1]
+			if r % 2 == 0 or c % 2 == 0:
+				raise ValueError("The width and length of the initial states board must be both odd.")
+			if initialStatesInterpreter == None:
+				raise IOError
+			for y in range(0, r):
+				for x in range(0, c):
+					if initialStates[y, x] != 0:
+						self.initiated[Coordinate(x - c//2, r//2 - y)] = initialStatesInterpreter(initialStates[y, x])
 
 	def step(self):
 		"""
@@ -106,12 +122,20 @@ class Grid:
 		rule dictionary.
 		"""
 		self.flea.step()
-		if self.flea.position in self.visited:
-			newState, turnDirection = rule[self.visited[self.flea.position]]
+		if self.flea.position in self.initiated:
+			newState, turnDirection = rule[self.initiated[self.flea.position]]
 		else:
-			newState, turnDirection = rule[self.initialState]
-		self.visited[Coordinate(self.flea.position.x, self.flea.position.y)] = newState
+			newState, turnDirection = rule[self.defaultState]
+		self.initiated[Coordinate(self.flea.position.x, self.flea.position.y)] = newState
 		self.flea.turn(turnDirection)
+
+	def get_state(self, position):
+		"""
+		Returns the state of the grid at position
+		"""
+		if position in self.initiated.keys():
+			return self.initiated[position]
+		return self.defaultState
 
 	def on_keyboard(self, event, lines):
 		"""
@@ -129,7 +153,7 @@ class Grid:
 		if hasattr(self, 'fleaLoc') and lines: 
 			plt.plot([self.fleaLoc.x, x], [self.fleaLoc.y, y], 'k-', zorder=0)
 		self.fleaLoc = Coordinate(x-self.x0, y-self.y0)
-		color = self.visited[self.flea.position].value if flea.position in self.visited else self.initialState.value
+		color = self.initiated[self.flea.position].value if flea.position in self.initiated else self.defaultState.value
 		plt.scatter(x-self.x0, y-self.y0, c=color, s=25, zorder=3)
 		self.fleaPoint = plt.scatter(x-self.x0, y-self.y0, c=color, s=25, zorder=3, edgecolors="k", linewidths=2)
 
@@ -146,12 +170,12 @@ class Grid:
 		x = np.arange(-1 * size, size + 1, 1)
 		y = np.arange(-1 * size, size + 1, 1)
 		xx, yy = np.meshgrid(x, y)
-		plt.scatter(xx, yy, c=self.initialState.value, s=25, zorder=3)
+		plt.scatter(xx, yy, c=self.defaultState.value, s=25, zorder=3)
 		for i in x:
 			for j in y:
 				position = Coordinate(i+self.x0,j+self.y0)
-				color = self.visited[position].value if position in self.visited else self.initialState.value
-				if color != self.initialState.value:
+				color = self.initiated[position].value if position in self.initiated else self.defaultState.value
+				if color != self.defaultState.value:
 					plt.scatter(i, j, c = color, s=25, zorder=3)
 
 		plt.axis('on')
@@ -170,18 +194,44 @@ class Grid:
 		"""
 		Computes the "radius" of the path.
 		"""
-		return sorted(map(lambda position: abs(position.x) + abs(position.y), self.visited.keys()), reverse=True)[0]
+		return sorted(map(lambda position: abs(position.x) + abs(position.y), self.initiated.keys()), reverse=True)[0]
 
 if __name__ == "__main__":
 	flea = Flea(Coordinate(0, 0), Direction.UP)
+
+	# Here I create the initial states grid. 0 denotes the red state, and 1 denotes the blue state
+	# The row and column marked with "###" is the origin
+															###
+	initialStates = np.array([[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],  ###
+							  [0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+							  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]])
+	initialStatesInterpreter = lambda x: State.BLUE if x == 1 else State.RED
+
 	rule = {
 		State.RED: (State.BLUE, Direction.LEFT),
 		State.BLUE: (State.RED, Direction.RIGHT)}
-	grid = Grid(flea, rule, State.RED)
-	'''
+	grid = Grid(flea, rule, State.RED, initialStates=initialStates, initialStatesInterpreter=initialStatesInterpreter)
 	grid.visualize(10, lines = True)
-	for step in range(15000):
-		grid.on_keyboard()
+
+	# Un-comment the following code to run the system 15000 times before visualizing!
 	'''
 	radii = []
 	
@@ -192,5 +242,7 @@ if __name__ == "__main__":
 	plt.plot(radii)
 	plt.show()
 	grid.visualize(size = 200, lines = False)
+	'''
+
 
 
