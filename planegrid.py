@@ -113,29 +113,6 @@ class Grid:
 		self.visited[Coordinate(self.flea.position.x, self.flea.position.y)] = newState
 		self.flea.turn(turnDirection)
 
-	def visualize(self, size=5, lines=True):
-		"""
-		blah blah plotting code that I copied pasted off stack overflow
-		"""
-		plt.xlim(-1 * size, size)
-		plt.ylim(-1 * size, size)
-		plt.gca().set_aspect('equal', adjustable='box')
-		x = np.arange(-1 * size, size + 1, 1)
-		y = np.arange(-1 * size, size + 1, 1)
-		xx, yy = np.meshgrid(x, y)
-		plt.scatter(xx, yy, c=self.initialState.value, s=25, zorder=3) 
-		plt.axis('on')
-		ax = plt.gca()
-		ax.xaxis.set_major_locator(MultipleLocator(1))
-		ax.xaxis.set_major_formatter(NullFormatter())
-		ax.yaxis.set_major_locator(MultipleLocator(1))
-		ax.yaxis.set_major_formatter(NullFormatter())
-		ax.tick_params(axis='both', length=0)
-		plt.grid(True, ls=':')
-		plt.gcf().canvas.mpl_connect('key_press_event', lambda x: self.on_keyboard(x, lines))
-		self.draw(lines)
-		plt.show()
-
 	def on_keyboard(self, event, lines):
 		"""
 		steps the grid when the right arrow key is pressed
@@ -156,7 +133,7 @@ class Grid:
 		plt.scatter(x-self.x0, y-self.y0, c=color, s=25, zorder=3)
 		self.fleaPoint = plt.scatter(x-self.x0, y-self.y0, c=color, s=25, zorder=3, edgecolors="k", linewidths=2)
 
-	def visualize2(self, size = 5, lines = True):
+	def visualize(self, size = 5, lines = True):
 		"""
 		blah blah plotting code that I copied pasted off stack overflow
 		"""
@@ -214,6 +191,6 @@ if __name__ == "__main__":
 		radii.append(grid.radius())
 	plt.plot(radii)
 	plt.show()
-	grid.visualize2(size = 500, lines = False)
+	grid.visualize(size = 200, lines = False)
 
 
