@@ -160,9 +160,9 @@ class Grid:
 	def draw(self, lines):
 		x = self.flea.position.x
 		y = self.flea.position.y
+		self.fleaLoc = Coordinate(x-self.x0, y-self.y0)
 		if hasattr(self, 'fleaLoc') and lines:
 			plt.plot([self.fleaLoc.x, x], [self.fleaLoc.y, y], 'k-', zorder=0)
-		self.fleaLoc = Coordinate(x-self.x0, y-self.y0)
 		color = self.initiated[self.flea.position].value if flea.position in self.initiated else self.defaultState.value
 		plt.scatter(x-self.x0, y-self.y0, c=color, s=25, zorder=3)
 		self.fleaPoint = plt.scatter(x-self.x0, y-self.y0, c=color, s=25, zorder=3, edgecolors="k", linewidths=2)
@@ -276,4 +276,4 @@ if __name__ == "__main__":
 
 	fig.tight_layout()  # otherwise the right y-label is slightly clipped
 	plt.show()
-	#grid.visualize(size = 200, lines = False)
+	grid.visualize(size = 200, lines = False)
