@@ -5,7 +5,7 @@ from matplotlib.ticker import MultipleLocator, NullFormatter
 
 class State(Enum):
 	"""
-	The State enum represents possible states (colors) of the grid vertices. 
+	The State enum represents possible states (colors) of the grid vertices.
 	The values of the enums are the pyplot shortcuts for the corresponding
 	colors, found here: https://matplotlib.org/2.0.2/api/colors_api.html.
 	"""
@@ -17,7 +17,7 @@ class Direction(Enum):
 	The Direction enum represents possible directions that the flea could be
 	facing. On a 2D lattice grid, these are up down left and right. Their values
 	are chosen so that turning directions can be achieved just be adding mod 4.
-	For example, a right turn followed by a left turn is the same as going up, 
+	For example, a right turn followed by a left turn is the same as going up,
 	as 1 + 3 = 0 (mod 4).
 	"""
 	UP = 0
@@ -27,8 +27,8 @@ class Direction(Enum):
 
 class Coordinate:
 	"""
-	The Coordinate class just holds an x and a y coordinate. The reason I didn't use 
-	a Python tuple is because I'm not sure if they're hashable, as I use them 
+	The Coordinate class just holds an x and a y coordinate. The reason I didn't use
+	a Python tuple is because I'm not sure if they're hashable, as I use them
 	as keys to a dictionary. Also, it's more extensible to use a separate class
 	in case we look at different coordinate systems later (e.g. hexagonal lattices).
 	"""
@@ -48,7 +48,7 @@ class Coordinate:
 class Flea:
 	"""
 	The Flea class represents the jumping fleas of our problem. A flea is determined
-	by the direction that it is facing, which is a Direction enum, and its position, 
+	by the direction that it is facing, which is a Direction enum, and its position,
 	which is a Coordinate.
 	"""
 	def __init__(self, initialPosition, initialDirection):
@@ -74,7 +74,7 @@ class Flea:
 		if (self.direction == Direction.RIGHT):
 			self.position.x += 1
 			print("RIGHT")
-	
+
 	def turn(self, newDirection):
 		"""
 		Changes flea's direction based on its current direction and a new turn direction
@@ -86,7 +86,7 @@ class Grid:
 	"""
 	The Grid class represents the grid that the flea is jumping around on. It is determined
 	by its initial state, a flea (which has an initial position and direction), and a rule.
-	The rule is a map from a state to a (state, turn direction) tuple 
+	The rule is a map from a state to a (state, turn direction) tuple
 	(see http://www-math.mit.edu/~dav/projectsB.pdf) for more information.
 
 	In addition, the visited dictionary is used to keep track of the states of coordinates
@@ -108,7 +108,7 @@ class Grid:
 			if r % 2 == 0 or c % 2 == 0:
 				raise ValueError("The width and length of the initial states board must be both odd.")
 			if initialStatesInterpreter == None:
-				raise IOError
+				raise ValueError("An initial state board was provided without an interpreter. ")
 			for y in range(0, r):
 				for x in range(0, c):
 					if initialStates[y, x] != 0:
@@ -118,7 +118,7 @@ class Grid:
 		"""
 		In a "grid step", the flea takes a step, and then we use the
 		state (color) of its position in order to determine which direction
-		that the flea turns and the new state of that position, using the 
+		that the flea turns and the new state of that position, using the
 		rule dictionary.
 		"""
 		self.flea.step()
@@ -150,7 +150,7 @@ class Grid:
 	def draw(self, lines):
 		x = self.flea.position.x
 		y = self.flea.position.y
-		if hasattr(self, 'fleaLoc') and lines: 
+		if hasattr(self, 'fleaLoc') and lines:
 			plt.plot([self.fleaLoc.x, x], [self.fleaLoc.y, y], 'k-', zorder=0)
 		self.fleaLoc = Coordinate(x-self.x0, y-self.y0)
 		color = self.initiated[self.flea.position].value if flea.position in self.initiated else self.defaultState.value
@@ -234,7 +234,7 @@ if __name__ == "__main__":
 	# Un-comment the following code to run the system 15000 times before visualizing!
 	'''
 	radii = []
-	
+
 	for step in range(15000):
 		print("{}: ".format(step), end = "")
 		grid.step()
@@ -243,6 +243,3 @@ if __name__ == "__main__":
 	plt.show()
 	grid.visualize(size = 200, lines = False)
 	'''
-
-
-
