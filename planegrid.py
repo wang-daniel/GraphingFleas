@@ -2,6 +2,7 @@ from enum import Enum
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.ticker import MultipleLocator, NullFormatter
+import math
 
 class State(Enum):
 	"""
@@ -11,6 +12,7 @@ class State(Enum):
 	"""
 	RED = "r"
 	BLUE = "b"
+	GREEN = "g"
 
 class Direction(Enum):
 	"""
@@ -51,9 +53,10 @@ class Flea:
 	by the direction that it is facing, which is a Direction enum, and its position,
 	which is a Coordinate.
 	"""
-	def __init__(self, initialPosition, initialDirection):
+	def __init__(self, initialPosition, initialDirection, mute = False):
 		self.position = initialPosition
 		self.direction = initialDirection
+		self.mute = mute
 
 	def __str__(self):
 		return self.position.__str__() + ", Direction: " + str(self.direction.name)
@@ -64,16 +67,16 @@ class Flea:
 		"""
 		if (self.direction == Direction.UP):
 			self.position.y += 1
-			print("UP")
+			if not self.mute: print("UP")
 		if (self.direction == Direction.LEFT):
 			self.position.x -= 1
-			print("LEFT")
+			if not self.mute: print("LEFT")
 		if (self.direction == Direction.DOWN):
 			self.position.y -= 1
-			print("DOWN")
+			if not self.mute: print("DOWN")
 		if (self.direction == Direction.RIGHT):
 			self.position.x += 1
-			print("RIGHT")
+			if not self.mute: print("RIGHT")
 
 	def turn(self, newDirection):
 		"""
@@ -97,6 +100,7 @@ class Grid:
 		self.rule = rule
 		self.defaultState = defaultState
 		self.initiated = {}
+		self.visited = set([])
 		# self.initiated is a hashmap whose keys are the positions whose states
 		# have been changed at least once; and the values are the current states
 		# of those positions.
@@ -114,6 +118,8 @@ class Grid:
 					if initialStates[y, x] != 0:
 						self.initiated[Coordinate(x - c//2, r//2 - y)] = initialStatesInterpreter(initialStates[y, x])
 
+		self._radius_ = 0
+		self._coverage_ = 0
 	def step(self):
 		"""
 		In a "grid step", the flea takes a step, and then we use the
@@ -126,6 +132,10 @@ class Grid:
 			newState, turnDirection = rule[self.initiated[self.flea.position]]
 		else:
 			newState, turnDirection = rule[self.defaultState]
+		if not self.flea.position in self.visited:
+			self._radius_ = max((self.flea.position.x**2 + self.flea.position.y**2)**0.5, self._radius_)
+			self._coverage_ += 1
+			self.visited.add(self.flea.position)
 		self.initiated[Coordinate(self.flea.position.x, self.flea.position.y)] = newState
 		self.flea.turn(turnDirection)
 
@@ -194,10 +204,15 @@ class Grid:
 		"""
 		Computes the "radius" of the path.
 		"""
-		return sorted(map(lambda position: abs(position.x) + abs(position.y), self.initiated.keys()), reverse=True)[0]
+		return self._radius_
+	def coverage(self):
+		"""
+		Computes the number of points ever visited
+		"""
+		return self._coverage_
 
 if __name__ == "__main__":
-	flea = Flea(Coordinate(0, 0), Direction.UP)
+	flea = Flea(Coordinate(0, 0), Direction.UP, mute = True)
 
 	# Here I create the initial states grid. 0 denotes the red state, and 1 denotes the blue state
 	# The row and column marked with "###" is the origin
@@ -227,19 +242,38 @@ if __name__ == "__main__":
 
 	rule = {
 		State.RED: (State.BLUE, Direction.LEFT),
-		State.BLUE: (State.RED, Direction.RIGHT)}
-	grid = Grid(flea, rule, State.RED, initialStates=initialStates, initialStatesInterpreter=initialStatesInterpreter)
-	grid.visualize(10, lines = True)
+		State.BLUE: (State.RED, Direction.RIGHT),
+		State.GREEN: (State.RED, Direction.LEFT)}
+	grid = Grid(flea, rule, State.RED)
+	#grid = Grid(flea, rule, State.RED, initialStates = initialStates, initialStatesInterpreter = initialStatesInterpreter)
+	#grid.visualize(10, lines = True)
 
 	# Un-comment the following code to run the system 15000 times before visualizing!
-	'''
+
 	radii = []
+	percent_coverages = []
 
 	for step in range(15000):
-		print("{}: ".format(step), end = "")
+		#print("{}: ".format(step), end = "")
 		grid.step()
+		r = grid.radius()
 		radii.append(grid.radius())
-	plt.plot(radii)
+		percent_coverages.append(grid.coverage() / (math.pi * (r**2)))
+	fig, ax1 = plt.subplots()
+
+	color = 'tab:red'
+	ax1.set_xlabel('Time')
+	ax1.set_ylabel('radii', color=color)
+	ax1.plot(radii, color=color)
+	ax1.tick_params(axis='y', labelcolor=color)
+
+	ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
+
+	color = 'tab:blue'
+	ax2.set_ylabel('percent coverages', color=color)  # we already handled the x-label with ax1
+	ax2.plot(percent_coverages, color=color)
+	ax2.tick_params(axis='y', labelcolor=color)
+
+	fig.tight_layout()  # otherwise the right y-label is slightly clipped
 	plt.show()
-	grid.visualize(size = 200, lines = False)
-	'''
+	#grid.visualize(size = 200, lines = False)
