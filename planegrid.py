@@ -212,7 +212,7 @@ class Grid:
 		return self._coverage_
 
 if __name__ == "__main__":
-	flea = Flea(Coordinate(0, 0), Direction.UP, mute = True)
+	flea = Flea(Coordinate(0, 0), Direction.RIGHT, mute = True)
 
 	# Here I create the initial states grid. 0 denotes the red state, and 1 denotes the blue state
 	# The row and column marked with "###" is the origin
