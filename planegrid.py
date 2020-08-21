@@ -263,17 +263,17 @@ if __name__ == "__main__":
 
 	color = 'tab:red'
 	ax1.set_xlabel('Time')
-	ax1.set_ylabel('radii', color=color)
+	ax1.set_ylabel('Radius', color=color)
 	ax1.plot(radii, color=color)
 	ax1.tick_params(axis='y', labelcolor=color)
 
 	ax2 = ax1.twinx()  # instantiate a second axes that shares the same x-axis
 
 	color = 'tab:blue'
-	ax2.set_ylabel('percent coverages', color=color)  # we already handled the x-label with ax1
+	ax2.set_ylabel('Percent Coverage', color=color)  # we already handled the x-label with ax1
 	ax2.plot(percent_coverages, color=color)
 	ax2.tick_params(axis='y', labelcolor=color)
 
 	fig.tight_layout()  # otherwise the right y-label is slightly clipped
 	plt.show()
-	grid.visualize(size = 200, lines = False)
+	grid.visualize(size = 30, lines = False)
